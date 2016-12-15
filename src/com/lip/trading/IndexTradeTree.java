@@ -167,7 +167,7 @@ public class IndexTradeTree {
      * @param rightTree
      * @return
      */
-    public IndexTradeTree mergeTree(IndexTradeTree leftTree, IndexTradeTree rightTree) {
+    public synchronized IndexTradeTree mergeTree(IndexTradeTree leftTree, IndexTradeTree rightTree) {
         if (leftTree == null)
             return rightTree;
         if (rightTree == null)
@@ -230,7 +230,7 @@ public class IndexTradeTree {
      * @param _price
      * @return
      */
-    public List<IndexTradeModel> getAbovePrice(double _price) {
+    public synchronized List<IndexTradeModel> getAbovePrice(double _price) {
         if(this.id==0)//根节点
         {
             if(this.rightTrade!=null) {
@@ -239,8 +239,10 @@ public class IndexTradeTree {
         }
         if (this.price >=_price)//右节点全部需要平仓
         {
-            //IndexTradeTree parent=this.parentTrade;
-            //parent.rightTrade=null;
+            IndexTradeTree parent=this.parentTrade;
+            if(parent!=null) {
+                parent.rightTrade = null;
+            }
             return this.toList();
         } else  {
             //TODO 非递归
@@ -257,7 +259,7 @@ public class IndexTradeTree {
      * @param _price
      * @return
      */
-    public List<IndexTradeModel> getBelowPrice(double _price) {
+    public synchronized List<IndexTradeModel> getBelowPrice(double _price) {
         if(this.id==0)//根节点
         {
             if (this.leftTrade != null) {
@@ -265,8 +267,10 @@ public class IndexTradeTree {
             }
         }
         if (this.price <=_price) {
-            //IndexTradeTree parent=this.parentTrade;
-            //parent.leftTrade=null;
+            IndexTradeTree parent=this.parentTrade;
+            if(parent!=null) {
+                parent.leftTrade = null;
+            }
             return this.toList();
         } else {
             if (this.leftTrade != null) {

@@ -10,10 +10,11 @@ package com.lip;
  */
 public class TestD {
 
+
     public static void main(String[] args) {
         new Thread(new Thread1()).start();
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -28,7 +29,8 @@ public class TestD {
             System.out.println("thread1 is waiting...");
             try {
                 //调用wait()方法，线程会放弃对象锁，进入等待此对象的等待锁定池
-                TestD.class.wait();
+                //TestD.class.wait();
+                Thread.sleep(1*1000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
