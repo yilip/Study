@@ -1,5 +1,7 @@
 package com.lip.trading.matchbox;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
+
 import java.util.Date;
 
 /**
@@ -15,7 +17,11 @@ public class Order {
     public int left;
     public String userId;
     public Direction direction;
-    public int status;
+    public OrderStatus status;
+    public Order()
+    {
+
+    }
     public Order(long _id,double _price,String _symbol,int _num,String _userId,Direction _d,Date _time)
     {
         this.id=_id;
@@ -27,6 +33,21 @@ public class Order {
         this.userId=_userId;
         this.left=num;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", price=" + price +
+                ", time=" + time +
+                ", symbol='" + symbol + '\'' +
+                ", num=" + num +
+                ", left=" + left +
+                ", userId='" + userId + '\'' +
+                ", direction=" + direction +
+                ", status=" + status +
+                '}';
+    }
 }
 enum Direction{
     BUY(0),SELL(1);
@@ -37,5 +58,5 @@ enum Direction{
     }
 }
 enum OrderStatus{
-
+    NEW,DEAL,PART_DEAL,CANCEL
 }

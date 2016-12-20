@@ -4,6 +4,7 @@ package com.lip.trading.matchbox;
 import com.lip.trading.ApplicationException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,40 +40,62 @@ public class Ask {
             orderNode = new OrderNode(order);
             return;
         }
+        if(order.price>orderNode.order.price)
+        {
+            OrderNode newRoot=new OrderNode(order);
+            newRoot.next=orderNode;
+            orderNode=newRoot;
+            return;
+        }
         OrderNode temp = orderNode;
-        while (order.price <= temp.order.price && order.time.getTime() >= temp.order.time.getTime()
-                && temp.next != null) {
+        while (temp.next != null&&order.price <= temp.next.order.price && order.time.getTime() >= temp.next.order.time.getTime()) {
             temp = temp.next;
         }
+        //插入新的订单
+        OrderNode temp1=temp.next;
         temp.next = new OrderNode(order);
+        temp.next.next=temp1;
     }
 
     /**
      * some one want to sell  and bid a price under ask 1
      *  新的成交订单
-     * @param price 成交价格
-     * @param num 成交数量
+     * @param order 成交订单
      */
-    public synchronized List<Order> out(double price, int num)
+    public synchronized List<Order> out(Order order)
     {
         List<Order>list=new ArrayList<>();
         //no ask
-        if(orderNode==null||num<=0)
+        if(orderNode==null||order.num<=0)
+            return list;
+        if(orderNode.order.price<order.price)
             return list;
         OrderNode temp=orderNode;
-        int n=num;
+        int n=order.left;
         while (n>0&&temp!=null)
         {
-            if(temp.order.price>=price) {
-                if (temp.order.left >= n) {
+            if(temp.order.price>=order.price) {
+                if(temp.order.left > n)
+                {
                     temp.order.left -= n;
+                    temp.order.status=OrderStatus.PART_DEAL;
+                    list.add(temp.order);
+                    order.status=OrderStatus.DEAL;
+                    return list;
+                }
+                else if (temp.order.left == n) {
+                    temp.order.left = 0;
+                    temp.order.status=OrderStatus.DEAL;
+                    order.status=OrderStatus.DEAL;
                     list.add(temp.order);
                     return list;
                 } else {
                     n -= temp.order.left;
                     temp.order.left = 0;
+                    temp.order.status=OrderStatus.DEAL;
                     list.add(temp.order);
                     temp = temp.next;
+                    order.status=OrderStatus.PART_DEAL;
                     /************************/
                     OrderNode temp2 = orderNode.next;
                     orderNode.next = null;
@@ -85,4 +108,30 @@ public class Ask {
         }
         return list;
     }
+    public void print()
+    {
+        System.out.println("*********order list********");
+        List<Order> list = this.toList();
+        for(Order order:list)
+        {
+            System.out.println(order);
+        }
+        System.out.println("*******order list end*******");
+    }
+    /**
+     *ask order
+     * @return
+     */
+    public List<Order>toList()
+    {
+        List<Order>list=new ArrayList<>();
+        OrderNode temp=orderNode;
+        while (temp!=null)
+        {
+            list.add(temp.order);
+            temp=temp.next;
+        }
+        return list;
+    }
+
 }
